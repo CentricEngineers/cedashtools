@@ -6,7 +6,7 @@ def has_vars(params: str) -> bool:
 
 
 def parse_url_params(params: str) -> dict:
-    """ Example: url_params='?a=test&b=pass' """
+    """ Example: params='?a=test&b=pass' """
     if not has_vars(params):
         return dict()
     return dict(arg_pair.split('=') for arg_pair in params[1:].split('&'))
