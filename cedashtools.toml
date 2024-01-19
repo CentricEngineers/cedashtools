@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=67.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cedashtoolkit"
+version = "1.0.0beta"
+description = "For use in your Centric Engineers tools"
+readme = "README.md"
+authors = [{ name = "Centric Engineers", email = "admin@centricengineers.com"}]
+license = { file = "LICENSE" }
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+]
+keywords = ["Centric Engineers"]
+dependencies = [
+    "requests >= 2.28.2"
+]
+requires-python = ">=3.8"
+
+[project.urls]
+Homepage = "https://github.com/CentricEngineers/cedashtoolkit.git"
