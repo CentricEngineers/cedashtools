@@ -3,8 +3,8 @@ requires = ["setuptools>=69.0.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "cedashtoolkit"
-version = "1.0.0beta"
+name = "cedashtools"
+version = "1.0.0b0"
 description = "For use in your Centric Engineers tools"
 readme = "README.md"
 authors = [{ name = "Centric Engineers", email = "admin@centricengineers.com"}]
