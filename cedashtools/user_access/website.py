@@ -1,5 +1,6 @@
 import requests
 from enum import Enum
+from tenacity import retry, wait_fixed, stop_after_attempt
 
 
 class AccessLevel(Enum):
@@ -12,6 +13,7 @@ ce_login_url = 'https://centricengineers.com/accounts/login/'
 ce_validation_url = 'https://centricengineers.com/licenses/validateuser/'
 
 
+@retry(wait=wait_fixed(1), stop=stop_after_attempt(10))
 def validate_user(user_hash: str, tool_id: str) -> AccessLevel:
     payload = {
         "user": user_hash,
@@ -23,6 +25,7 @@ def validate_user(user_hash: str, tool_id: str) -> AccessLevel:
     return AccessLevel(json['access_level'])
 
 
+@retry(wait=wait_fixed(1), stop=stop_after_attempt(10))
 def login(username: str, password: str):
     ses.get(ce_login_url)
     csrf = ses.cookies['csrftoken']
