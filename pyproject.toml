@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "cedashtools"
-version = "0.0.2"
+version = "0.1.1"
 description = "For use in your Centric Engineers tools"
 readme = "README.md"
 authors = [{ name = "Centric Engineers", email = "admin@centricengineers.com"}]
