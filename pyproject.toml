@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "cedashtools"
-version = "0.1.1"
+version = "0.2.0"
 description = "For use in your Centric Engineers tools"
 readme = "README.md"
 authors = [{ name = "Centric Engineers", email = "admin@centricengineers.com"}]
@@ -16,8 +16,9 @@ classifiers = [
 ]
 keywords = ["Centric Engineers"]
 dependencies = [
-    "requests >= 2.31.0",
-    "tenacity >= 8.3.0",
+    "requests >= 2.32.3",
+    "tenacity >= 9.0.0",
+    "rsa >= 4.9",
 ]
 requires-python = ">=3.8"
 
