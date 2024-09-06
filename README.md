@@ -22,15 +22,17 @@ app.layout = html.Div([
 
 
 @app.callback(Output('content', 'children'),
-              [Input('url', 'search')])
+              Input('url', 'search'))
 def display_content_based_on_access(search: str):
     # Tool ID provided by centricengineers.com
     tool_id = 'a_tool_id'
-    # run the validator and set the USER_PAID variable for the duration of this session
-    validator.website.login('username', 'password')
+    
+    # run the validator 
     url_vars = validator.parse_url_params(search)  # URL vars contain user information
     access_level = validator.get_access_level(url_vars, tool_id)
-    if access_level == AccessLevel.PAID:
+    
+    # provide access based on the users AccessLevel
+    if access_level == AccessLevel.PRO:
         layout = html.Div([html.H1(["Paid Content"])])
     else:
         layout = html.Div([html.H1(["Free Content"])])
@@ -64,7 +66,6 @@ if __name__ == '__main__':
 ### home.py
 
 ```python
-import app
 from dash import html, register_page
 from cedashtools.user_access import validator
 from cedashtools.user_access.website import AccessLevel
@@ -79,10 +80,12 @@ register_page(
 def layout(**url_vars):  # URL vars contain user information
     # Tool ID provided by centricengineers.com
     tool_id = 'a_tool_id'
-    # run the validator on the home page and set the app.USER_PAID variable for the duration of this session
-    validator.website.login('username', 'password')
+    
+    # run the validator on the home page 
     access_level = validator.get_access_level(url_vars, tool_id)
-    if access_level == AccessLevel.PAID:
+    
+    # provide access based on the users AccessLevel
+    if access_level == AccessLevel.PRO:
         layout = html.Div([html.H1(["Paid Content"])])
     else:
         layout = html.Div([html.H1(["Free Content"])])
