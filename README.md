@@ -9,7 +9,7 @@ In a simple single page Dash-Plotly application.
 ```python
 import dash
 from dash import dcc, html, Input, Output
-from cedashtools.user_access import validator
+from cedashtools.user_access import validator, encryption
 from cedashtools.user_access.website import AccessLevel
 
 
@@ -26,11 +26,15 @@ app.layout = html.Div([
 def display_content_based_on_access(search: str):
     # Tool ID provided by centricengineers.com
     tool_id = 'a_tool_id'
-    # run the validator and set the USER_PAID variable for the duration of this session
-    validator.website.login('username', 'password')
+    encryption.keys.PUBLIC_KEY_FILE_PATH = r'/Path/To/File/Containing/Public_Key'
+    encryption.keys.PRIVATE_KEY_FILE_PATH = r'/Path/To/File/Containing/Private_Key'
+    
     url_vars = validator.parse_url_params(search)  # URL vars contain user information
-    access_level = validator.get_access_level(url_vars, tool_id)
-    if access_level == AccessLevel.PAID:
+    access_level = validator.get_access_level(
+        url_vars, tool_id, encryption.keys.public_key, encryption.keys.private_key
+    )
+    
+    if access_level >= AccessLevel.PRO:
         layout = html.Div([html.H1(["Paid Content"])])
     else:
         layout = html.Div([html.H1(["Free Content"])])
@@ -64,9 +68,8 @@ if __name__ == '__main__':
 ### home.py
 
 ```python
-import app
 from dash import html, register_page
-from cedashtools.user_access import validator
+from cedashtools.user_access import validator, encryption
 from cedashtools.user_access.website import AccessLevel
 
 register_page(
@@ -77,12 +80,17 @@ register_page(
 
 
 def layout(**url_vars):  # URL vars contain user information
+    
     # Tool ID provided by centricengineers.com
     tool_id = 'a_tool_id'
-    # run the validator on the home page and set the app.USER_PAID variable for the duration of this session
-    validator.website.login('username', 'password')
-    access_level = validator.get_access_level(url_vars, tool_id)
-    if access_level == AccessLevel.PAID:
+    encryption.keys.PUBLIC_KEY_STRING = '-----BEGIN PUBLIC KEY-----FakePublicKey-----END PUBLIC KEY-----'
+    encryption.keys.PRIVATE_KEY_STRING = '-----BEGIN PRIVATE KEY-----FakePrivateKey-----END PRIVATE KEY-----'
+
+    access_level = validator.get_access_level(
+        url_vars, tool_id, encryption.keys.public_key, encryption.keys.private_key
+    )
+    
+    if access_level >= AccessLevel.PRO:
         layout = html.Div([html.H1(["Paid Content"])])
     else:
         layout = html.Div([html.H1(["Free Content"])])

@@ -1,7 +1,8 @@
 import requests
 from enum import Enum
-import rsa
+from cryptography.hazmat.primitives.asymmetric import rsa
 from tenacity import retry, wait_fixed, stop_after_attempt
+from cedashtools.user_access.encryption import verify_signature, decrypt_message
 
 
 ce_validation_url = "https://centricengineers.com/licenses/validateuser/"
@@ -14,11 +15,25 @@ class AccessLevel(Enum):
     PRO = 3
     ENTERPRISE = 4
 
+    def __eq__(self, other):
+        return self.value == other.value
+
+    def __gt__(self, other):
+        return self.value > other.value
+
+    def __lt__(self, other):
+        return self.value < other.value
+
+    def __ge__(self, other):
+        return self.value >= other.value
+
+    def __le__(self, other):
+        return self.value <= other.value
+
 
 @retry(wait=wait_fixed(1), stop=stop_after_attempt(10))
 def validate_user(user_hash: str, tool_id: str,
-                  my_private_key: rsa.PrivateKey,
-                  ce_public_key: rsa.PublicKey) -> AccessLevel:
+                  public_key: rsa.RSAPublicKey, private_key: rsa.RSAPrivateKey) -> AccessLevel:
     ses = requests.Session()
     payload = {
         "user": user_hash,
@@ -27,18 +42,14 @@ def validate_user(user_hash: str, tool_id: str,
     response = ses.get(ce_validation_url, params=payload)
     response.raise_for_status()
     json = response.json()
-    level = _extract_level(json, my_private_key, ce_public_key)
+    level = extract_level(json, public_key, private_key)
     return AccessLevel(level)
 
 
-def _extract_level(json: dict, my_private_key: rsa.PrivateKey,
-                   ce_public_key: rsa.PublicKey) -> int:
-    level = rsa.decrypt(json['access_level'], my_private_key)
-    signature = json['signature']
-    validation = rsa.verify(level, signature, ce_public_key)
-    if validation == 'SHA-512':
-        return int(level.decode('utf8'))
+def extract_level(json: dict, public_key: rsa.RSAPublicKey, private_key: rsa.RSAPrivateKey) -> int:
+    encrypted_level = bytes.fromhex(json['access_level'])
+    signature = bytes.fromhex(json['signature'])
+    if verify_signature(public_key, signature, encrypted_level):
+        return int(decrypt_message(private_key, encrypted_level))
     return 0
-
-
 
