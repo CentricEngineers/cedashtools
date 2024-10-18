@@ -22,7 +22,7 @@ app.layout = html.Div([
 
 
 @app.callback(Output('content', 'children'),
-              [Input('url', 'search')])
+              Input('url', 'search'))
 def display_content_based_on_access(search: str):
     # Tool ID provided by centricengineers.com
     tool_id = 'a_tool_id'
