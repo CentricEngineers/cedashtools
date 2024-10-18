@@ -1,10 +1,20 @@
-import os
 from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding, rsa
 
 
 def decrypt_message(private_key: rsa.RSAPrivateKey, encrypted_message: bytes) -> bytes:
+    """Decrypts a message
+
+    Note: Uses SHA256 encryption
+
+    Args:
+        private_key: the private key used for decryption
+        encrypted_message: the message to be decrypted
+
+    Returns:
+        The decrypted message
+    """
     decrypted_message = private_key.decrypt(
         encrypted_message,
         padding.OAEP(
@@ -17,6 +27,18 @@ def decrypt_message(private_key: rsa.RSAPrivateKey, encrypted_message: bytes) ->
 
 
 def verify_signature(public_key: rsa.RSAPublicKey, signature: bytes, message: bytes) -> bool:
+    """Verifies a signature on an encrypted message
+
+    Note: Uses SHA256 encryption
+
+    Args:
+        public_key: the public key used for signature verification
+        signature: the signature to be verified
+        message: the message signed by the signature
+
+    Returns:
+        True if verification passes, False otherwise
+    """
     try:
         public_key.verify(
             signature,
@@ -32,7 +54,7 @@ def verify_signature(public_key: rsa.RSAPublicKey, signature: bytes, message: by
     return True
 
 
-class _Keys:
+class Keys:
 
     PUBLIC_KEY_STRING: str = None
     PUBLIC_KEY_FILE_PATH: str = None
@@ -79,7 +101,7 @@ class _Keys:
             return serialization.load_pem_private_key(key_file.read(), password=None)
 
 
-keys = _Keys()
+keys = Keys()
 
 
 
