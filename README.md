@@ -1,5 +1,5 @@
 # Summary
-Use this package with your Centric Engineers tools to acquire user access levels from centricengineers.com.
+Use this package with your Centric Engineers tools to acquire user access levels from CentricEngineers.com.
 
 # Usage
 
@@ -84,7 +84,7 @@ register_page(
 
 def layout(**url_vars):  # URL vars contain user information
     
-    # Tool ID provided by centricengineers.com
+    # Tool ID provided by CentricEngineers.com
     tool_id = 'a_tool_id'
 
     # encryption keys can also be specified by string
