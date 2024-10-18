@@ -9,8 +9,8 @@ In a simple single page Dash-Plotly application.
 ```python
 import dash
 from dash import dcc, html, Input, Output
-from cedashtools.user_access import validator, encryption
-from cedashtools.user_access.website import AccessLevel
+from cedashtools.user_access import validation, encryption
+from cedashtools.user_access.website import AccessLevel, ToolPayload, ce_validation_url
 
 
 app = dash.Dash(__name__)
@@ -26,14 +26,17 @@ app.layout = html.Div([
 def display_content_based_on_access(search: str):
     # Tool ID provided by centricengineers.com
     tool_id = 'a_tool_id'
+    
+    # encryption keys can be specified by file path
     encryption.keys.PUBLIC_KEY_FILE_PATH = r'/Path/To/File/Containing/Public_Key'
     encryption.keys.PRIVATE_KEY_FILE_PATH = r'/Path/To/File/Containing/Private_Key'
     
-    url_vars = validator.parse_url_params(search)  # URL vars contain user information
-    access_level = validator.get_access_level(
-        url_vars, tool_id, encryption.keys.public_key, encryption.keys.private_key
-    )
+    # get user's access level
+    user_id = validation.get_user_id(validation.parse_url_params(search))  # URL vars contain user information
+    payload = ToolPayload(user_id, tool_id)
+    access_level = validation.get_access_level(ce_validation_url, payload, encryption.keys)
     
+    # display content based on access level
     if access_level >= AccessLevel.PRO:
         layout = html.Div([html.H1(["Paid Content"])])
     else:
@@ -69,8 +72,8 @@ if __name__ == '__main__':
 
 ```python
 from dash import html, register_page
-from cedashtools.user_access import validator, encryption
-from cedashtools.user_access.website import AccessLevel
+from cedashtools.user_access import validation, encryption
+from cedashtools.user_access.website import AccessLevel, ToolPayload, ce_validation_url
 
 register_page(
     __name__,
@@ -83,16 +86,28 @@ def layout(**url_vars):  # URL vars contain user information
     
     # Tool ID provided by centricengineers.com
     tool_id = 'a_tool_id'
+
+    # encryption keys can also be specified by string
     encryption.keys.PUBLIC_KEY_STRING = '-----BEGIN PUBLIC KEY-----FakePublicKey-----END PUBLIC KEY-----'
     encryption.keys.PRIVATE_KEY_STRING = '-----BEGIN PRIVATE KEY-----FakePrivateKey-----END PRIVATE KEY-----'
 
-    access_level = validator.get_access_level(
-        url_vars, tool_id, encryption.keys.public_key, encryption.keys.private_key
-    )
-    
+    # get user's access level
+    user_id = validation.get_user_id(url_vars)
+    payload = ToolPayload(user_id, tool_id)
+    access_level = validation.get_access_level(ce_validation_url, payload, encryption.keys)
+
+    # display content based on access level
     if access_level >= AccessLevel.PRO:
         layout = html.Div([html.H1(["Paid Content"])])
     else:
         layout = html.Div([html.H1(["Free Content"])])
     return layout
 ```
+
+# Change Log
+
+## Version 0.3.0 (10-18-2024)
+
+- Added cryptography support
+- Refactored API
+
